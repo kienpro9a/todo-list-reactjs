@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Checkbox, Button } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, SaveTwoTone } from '@ant-design/icons';
 import _ from 'lodash'
 
 const Section = ({ todo, setTodo }) => {
@@ -8,6 +8,8 @@ const Section = ({ todo, setTodo }) => {
   const [filter, setFilter] = useState([]);
   const [indeterminate, setIndeterminate] = React.useState(false);
   const [checkAll, setCheckAll] = React.useState(false);
+
+  const [edit, setEdit] = useState({})
 
   const options = [
     { label: 'Completed', value: true },
@@ -26,6 +28,41 @@ const Section = ({ todo, setTodo }) => {
     localStorage.setItem('TodoList', JSON.stringify(list))
   }
 
+  const onCheckChange = list => {
+    setFilter(list);
+    setIndeterminate(!!list.length && list.length < options.length);
+    setCheckAll(list.length === options.length);
+  };
+
+  const onCheckAllChange = e => {
+    setFilter(e.target.checked ? options.map(x => x.value) : []);
+    setIndeterminate(false);
+    setCheckAll(e.target.checked);
+  };
+
+  const handleEdit = list => {
+    setEdit(list)
+  }
+
+  const handleSaveEdit = list => {
+    const listEdit = [...todo]
+    const objIndex = listEdit.findIndex(x => x.id === list.id)
+    listEdit[objIndex].task = edit.task
+    setTodo(listEdit)
+    localStorage.setItem('TodoList', JSON.stringify(listEdit))
+    setEdit({})
+    return
+  }
+
+  useEffect(() => {
+    console.log(edit)
+  }, [edit])
+
+  const handleEditOnChange = value => {
+    const list = { ...edit, task: value }
+    setEdit(list)
+  }
+
   const todoMap = todo.filter(s => s.task.toLowerCase().indexOf(search) > -1).filter(f => {
     let count = 0
     if (_.includes(filter, f.completed)) {
@@ -39,22 +76,10 @@ const Section = ({ todo, setTodo }) => {
     }
   })
 
-  const onCheckChange = list => {
-    setFilter(list);
-    setIndeterminate(!!list.length && list.length < options.length);
-    setCheckAll(list.length === options.length);
-  };
-
-  const onCheckAllChange = e => {
-    setFilter(e.target.checked ? options.map(x => x.value) : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
-  };
-
   return (
     <>
       <div className='form-outline mb-3'>
-        <input type='text' value={search} placeholder="Search" className="form-control" onChange={e => setSearch(e.target.value)} />
+        <input type='text' placeholder="Search" className="form-control" onChange={e => setSearch(e.target.value)} />
       </div>
       <div className='form-check mb-3'>
         <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>All</Checkbox>
@@ -65,16 +90,28 @@ const Section = ({ todo, setTodo }) => {
           {todoMap.map(data => (
             <div className="todo-item" key={data.id}>
               <Checkbox onChange={() => handleCheck(data.id)} checked={data.completed} >
-                <div className={(data.completed ? 'text-decoration-line-through' : null)} >
-                  {data.task}
-                </div>
+                {!_.isEmpty(edit) && edit.id === data.id ?
+                  <>
+                    <input value={edit.task} className="form-control" onChange={e => handleEditOnChange(e.target.value)} />
+                  </> :
+                  <div className={(data.completed ? 'text-decoration-line-through' : null)} >
+                    {data.task}
+                  </div>
+                }
               </Checkbox>
-              <Button icon={<DeleteOutlined />} className='float-end' danger onClick={() => handleDelete(data.id)} />
+              <div className='float-end'>
+                {!_.isEmpty(edit) && edit.id === data.id ?
+                  <Button icon={<SaveTwoTone twoToneColor="#6666ff" />} size='large' onClick={() => handleSaveEdit(data)} />
+                  :
+                  <Button icon={<EditTwoTone twoToneColor="#6666ff" />} size='large' onClick={() => handleEdit(data)} />
+                }
+                <Button icon={<DeleteTwoTone twoToneColor="#ff0000" />} size='large' onClick={() => handleDelete(data.id)} />
+              </div>
             </div>
           ))}
         </div>
       ) : (
-        <div class="alert alert-warning" role="alert">There are no tasks, please add a new one</div>
+        <div className="alert alert-warning" role="alert">There are no tasks, please add a new one</div>
       )}
     </>
   )
