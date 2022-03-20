@@ -1,79 +1,74 @@
 import React, { useState } from "react";
-import { Checkbox } from "antd";
 import _ from "lodash";
 import { useSelector } from "react-redux";
 import TodoItem from "./todoItem";
+import { Input, Stack, Checkbox, CheckboxGroup, Box } from "@chakra-ui/react";
 
 const Section = () => {
   const todo = useSelector((state) => state.todos);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState([]);
-  const [indeterminate, setIndeterminate] = useState(false);
-  const [checkAll, setCheckAll] = useState(false);
   const options = [
-    { label: "Completed", value: true },
-    { label: "Not-complete", value: false }
+    { id: 1, label: "Completed" },
+    { id: 2, label: "Not-complete" }
   ];
-  const onCheckChange = (list) => {
-    setFilter(list);
-    setIndeterminate(!!list.length && list.length < options.length);
-    setCheckAll(list.length === options.length);
+  const [checkAll, setCheckAll] = useState(false);
+  const onChangeCheck = (value) => {
+    setFilter(value);
+    if (value.length === 2) {
+      setCheckAll(true);
+    } else {
+      setCheckAll(false);
+    }
   };
-  const onCheckAllChange = (e) => {
-    setFilter(e.target.checked ? options.map((x) => x.value) : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
+  const onChangeCheckAll = (e) => {
+    if (e.target.checked) {
+      setCheckAll(true);
+      setFilter(options.map((option) => option.label));
+    } else {
+      setCheckAll(false);
+      setFilter([]);
+    }
   };
-  const todoMap = todo
-    .filter((s) => s.task.toLowerCase().indexOf(search) > -1)
-    .filter((f) => {
-      let count = 0;
-      if (_.includes(filter, f.completed)) {
-        count++;
-      }
-      if (_.isEmpty(filter)) return true;
-      if (count > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  const todoMap = todo.filter((s) => s.task.toLowerCase().indexOf(search) > -1);
   return (
-    <>
-      <div className="form-outline mb-3">
-        <input
-          type="text"
-          placeholder="Search"
-          className="form-control"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-      <div className="form-check mb-3">
-        <Checkbox
-          indeterminate={indeterminate}
-          onChange={onCheckAllChange}
-          checked={checkAll}
-        >
+    <Box>
+      <Input
+        mb="4"
+        placeholder="Search"
+        onChange={(e) => setSearch(e.target.value)}
+        _focus={{ bg: "white", borderColor: "blue.100" }}
+      />
+      <Stack mb="4" spacing={[1, 5]} direction={["column", "row"]}>
+        <Checkbox onChange={onChangeCheckAll} isChecked={checkAll}>
           All
         </Checkbox>
-        <Checkbox.Group
-          options={options}
-          onChange={onCheckChange}
-          value={filter}
-        />
-      </div>
-      {todoMap.length ? (
-        <div className="todo-list">
-          {todoMap.map((todo) => (
-            <TodoItem todo={todo} key={todo.id} />
+        <CheckboxGroup onChange={onChangeCheck} value={filter}>
+          {options.map((option) => (
+            <Checkbox key={option.id} value={option.label}>
+              {option.label}
+            </Checkbox>
           ))}
-        </div>
+        </CheckboxGroup>
+      </Stack>
+      {todoMap.length ? (
+        <Box>
+          {todoMap.map((todo) => {
+            if (
+              (todo.completed && _.includes(filter, options[0].label)) ||
+              (!todo.completed && _.includes(filter, options[1].label)) ||
+              _.isEmpty(filter)
+            )
+              return <TodoItem key={todo.id} todo={todo} />;
+            return null;
+          })}
+        </Box>
       ) : (
-        <div className="alert alert-warning" role="alert">
+        <Box bg="yellow.100" p="4">
           There are no tasks, please add a new one
-        </div>
+        </Box>
       )}
-    </>
+    </Box>
   );
 };
 

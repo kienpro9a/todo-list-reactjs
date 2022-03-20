@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { Checkbox, Button } from "antd";
-import { DeleteTwoTone, EditTwoTone, SaveTwoTone } from "@ant-design/icons";
+import {
+  Checkbox,
+  Button,
+  Flex,
+  Spacer,
+  Center,
+  Icon,
+  Input,
+  Box
+} from "@chakra-ui/react";
+import { MdDeleteOutline, MdEdit, MdSave } from "react-icons/md";
 import _ from "lodash";
 import { checkCompleteTodo, deleteTodo, updateTodo } from "../redux/todoSlice";
 import { useDispatch } from "react-redux";
@@ -41,45 +50,60 @@ const TodoItem = ({ todo }) => {
     setEdit(list);
   };
   return (
-    <div className="todo-item">
-      <Checkbox onChange={handleCheck} checked={todo.completed}>
+    <Flex bg="gray.100" mb="1" pl="4">
+      <Box display="contents">
+        <Checkbox onChange={handleCheck} isChecked={todo.completed} mr="4" />
         {!_.isEmpty(edit) && edit.id === todo.id ? (
-          <>
-            <input
-              value={edit.task}
-              className="form-control"
-              onChange={(e) => handleEditOnChange(e.target.value)}
-            />
-          </>
+          <Input
+            type="text"
+            width="auto"
+            value={edit.task}
+            onChange={(e) => handleEditOnChange(e.target.value)}
+            autoFocus
+            _focus={{ bg: "white", borderColor: "blue.100" }}
+          />
         ) : (
-          <div
-            className={todo.completed ? "text-decoration-line-through" : null}
+          <Center
+            cursor="pointer"
+            onClick={handleCheck}
+            as={todo.completed ? "s" : null}
           >
             {todo.task}
-          </div>
+          </Center>
         )}
-      </Checkbox>
-      <div className="float-end">
+      </Box>
+      <Spacer />
+      <Box>
         {!_.isEmpty(edit) && edit.id === todo.id ? (
           <Button
-            icon={<SaveTwoTone twoToneColor="#6666ff" />}
-            size="large"
+            leftIcon={<Icon as={MdSave} />}
+            colorScheme="teal"
+            variant="outline"
             onClick={handleSaveEdit}
-          />
+          >
+            Save
+          </Button>
         ) : (
           <Button
-            icon={<EditTwoTone twoToneColor="#6666ff" />}
-            size="large"
+            leftIcon={<Icon as={MdEdit} />}
+            colorScheme="blue"
+            variant="outline"
             onClick={() => handleEdit(todo)}
-          />
+          >
+            Edit
+          </Button>
         )}
         <Button
-          icon={<DeleteTwoTone twoToneColor="#ff0000" />}
-          size="large"
+          leftIcon={<Icon as={MdDeleteOutline} />}
+          colorScheme="red"
+          variant="outline"
           onClick={handleDelete}
-        />
-      </div>
-    </div>
+          ml="1"
+        >
+          Delete
+        </Button>
+      </Box>
+    </Flex>
   );
 };
 

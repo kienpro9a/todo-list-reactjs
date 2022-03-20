@@ -1,23 +1,16 @@
 import Header from "./components/header";
 import Section from "./components/section";
-import 'antd/dist/antd.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container, Box } from '@chakra-ui/react'
 
 
 function App() {
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-md-12">
-          <div className="card card-white">
-            <div className="card-body">
-              <Header />
-              <Section />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Container maxW='container.xl' bg='gray.50'>
+      <Box padding='4'>
+        <Header />
+        <Section />
+      </Box>
+    </Container>
   );
 }
 

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addTodo } from "../redux/todoSlice";
+import {
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Button
+} from "@chakra-ui/react";
 
 const Header = () => {
   const [newTodo, setNewTodo] = useState("");
@@ -20,26 +27,26 @@ const Header = () => {
     setNewTodo("");
   };
   return (
-    <form onSubmit={handleSubmit} className="input-group mb-3">
-      <input
-        type="text"
-        value={newTodo}
-        className="form-control"
-        placeholder="New Task..."
-        onChange={(e) => setNewTodo(e.target.value)}
-      />
-      <div className="input-group-append">
-        <button className="btn btn-outline-primary" type="submit">
-          Submit
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-      </div>
+    <form onSubmit={handleSubmit}>
+      <FormLabel>Add todo list</FormLabel>
+      <InputGroup pb="4">
+        <Input
+          pr="9rem"
+          type="text"
+          value={newTodo}
+          placeholder="New Task..."
+          _focus={{ bg: "white", borderColor: "blue.100" }}
+          onChange={(e) => setNewTodo(e.target.value)}
+        />
+        <InputRightElement width="9rem">
+          <Button type="submit" colorScheme="blue" size="sm">
+            Submit
+          </Button>
+          <Button colorScheme="blue" size="sm" onClick={handleReset}>
+            Clear
+          </Button>
+        </InputRightElement>
+      </InputGroup>
     </form>
   );
 };

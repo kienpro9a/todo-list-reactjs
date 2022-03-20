@@ -2,7 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const todoSlice = createSlice({
   name: "todos",
-  initialState: JSON.parse(localStorage.getItem("TodoList")) || [],
+  initialState: [
+    { id: 1, completed: false, task: "qwer" },
+    { id: 2, completed: true, task: "asdf" },
+    { id: 3, completed: false, task: "zxcv" },
+    { id: 4, completed: true, task: "qrwutiy" },
+    { id: 5, completed: true, task: "fggfhvbn" },
+    { id: 6, completed: false, task: "asdfasdf" }
+  ],
   reducers: {
     addTodo: (state, action) => {
       const newTodo = {
@@ -11,22 +18,18 @@ const todoSlice = createSlice({
         task: action.payload.task
       };
       state.push(newTodo);
-      localStorage.setItem("TodoList", JSON.stringify(state));
     },
     checkCompleteTodo: (state, action) => {
       const index = state.findIndex((todo) => todo.id === action.payload.id);
       state[index].completed = action.payload.completed;
-      localStorage.setItem("TodoList", JSON.stringify(state));
     },
     deleteTodo: (state, action) => {
       state = state.filter((todo) => todo.id !== action.payload.id);
-      localStorage.setItem("TodoList", JSON.stringify(state));
       return state;
     },
     updateTodo: (state, action) => {
       const index = state.findIndex((todo) => todo.id === action.payload.id);
       state[index].task = action.payload.task;
-      localStorage.setItem("TodoList", JSON.stringify(state));
     }
   }
 });
